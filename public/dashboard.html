@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./css/styles.css">       
+    <link rel="stylesheet" href="./css/dashboard.css">    
+    <title>Dashboard - Plataforma de Estudos</title>
+</head>
+<body>
+    <div class="main-dashboard">
+        <div class="dashboard-header">
+            <h1>Bem-vindo ao seu Dashboard, <span id="usernameDisplay"></span>!</h1>
+            <nav class="main-nav">
+                <a href="/home.html">Início</a>
+                <a href="/dashboard.html" class="active">Dashboard</a>
+                <a href="/about.html">Sobre</a>
+                <button id="logoutBtn" class="btn-logout">Sair</button>
+            </nav>
+        </div>
+
+        <div class="dashboard-content">
+            <div class="card-dashboard">
+                <h2>Suas Tarefas</h2>
+                <ul id="taskList">
+                    </ul>
+                <button class="btn-add-task">Adicionar Nova Tarefa</button>
+            </div>
+
+            <div class="card-dashboard">
+                <h2>Meus Materiais de Estudo</h2>
+                <ul>
+                    <li>Notas de Álgebra Linear</li>
+                    <li>Resumos de Química Orgânica</li>
+                    <li>Artigos sobre Inteligência Artificial</li>
+                </ul>
+                <button class="btn-add-material">Adicionar Material</button>
+            </div>
+
+            <div class="card-dashboard">
+                <h2>Progresso</h2>
+                <div class="progress-section">
+                    <div class="progress-label">Acertos: <span id="acertosPercentage">0%</span></div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" id="acertosBar"></div>
+                    </div>
+                </div>
+                <div class="progress-section">
+                    <div class="progress-label">Conclusão: <span id="conclusaoPercentage">0%</span></div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" id="conclusaoBar"></div>
+                    </div>
+                </div>
+                <div class="progress-chart">
+                    <img src="./img/placeholder_chart.png" alt="Gráfico de Progresso">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="taskModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2 id="modalTitle">Adicionar Tarefa</h2>
+            <form id="taskForm">
+                <input type="hidden" id="taskId" name="id">
+                <div class="textfield">
+                    <label for="materia">Matéria:</label>
+                    <input type="text" id="materia" name="materia" required>
+                </div>
+                <div class="textfield">
+                    <label for="descricao">Descrição:</label>
+                    <textarea id="descricao" name="descricao" rows="3" required></textarea>
+                </div>
+                <div class="textfield">
+                    <label for="dataLimite">Data Limite:</label>
+                    <input type="date" id="dataLimite" name="dataLimite">
+                </div>
+                <div class="textfield">
+                    <label for="estrategia">Estratégia de Estudo:</label>
+                    <input type="text" id="estrategia" name="estrategia">
+                </div>
+                <div class="textfield">
+                    <label for="status">Status:</label>
+                    <select id="status" name="status">
+                        <option value="Pendente">Pendente</option>
+                        <option value="Em Andamento">Em Andamento</option>
+                        <option value="Concluído">Concluído</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-login">Salvar Tarefa</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            console.log('Script do Dashboard carregado e DOMContentLoaded disparado.'); // Log inicial
+            const usernameDisplay = document.getElementById('usernameDisplay');
+            const logoutBtn = document.getElementById('logoutBtn');
+            const taskList = document.getElementById('taskList');
+            const btnAddTask = document.querySelector('.btn-add-task');
+            // ADIÇÃO: Seleção do botão "Adicionar Material"
+            const btnAddMaterial = document.querySelector('.btn-add-material'); 
+            const taskModal = document.getElementById('taskModal');
+            const closeButton = document.querySelector('.close-button');
+            const taskForm = document.getElementById('taskForm');
+            const modalTitle = document.getElementById('modalTitle');
+
+            console.log('Elementos selecionados:'); // Log dos elementos
+            console.log('usernameDisplay:', usernameDisplay);
+            console.log('logoutBtn:', logoutBtn);
+            console.log('taskList:', taskList);
+            console.log('btnAddTask:', btnAddTask); 
+            console.log('taskModal:', taskModal); 
+            console.log('closeButton:', closeButton);
+            console.log('taskForm:', taskForm);
+            console.log('modalTitle:', modalTitle);
+            // ADIÇÃO: Log para o botão "Adicionar Material"
+            console.log('Botão Adicionar Material:', btnAddMaterial); 
+
+
+            let editingTaskId = null; // Para controlar se estamos editando ou adicionando
+
+            // Função para buscar e exibir as informações do usuário
+            async function fetchUserInfo() {
+                try {
+                    console.log('Tentando buscar informações do usuário...');
+                    const response = await fetch('/api/user-info');
+                    console.log('Resposta da API de usuário:', response.status, response.ok);
+                    if (response.ok) {
+                        const data = await response.json();
+                        console.log('Dados do usuário recebidos:', data);
+                        if (data.username) {
+                            usernameDisplay.textContent = data.username;
+                            fetchTasks(); // Carrega as tarefas após o usuário ser identificado
+                        }
+                    } else {
+                        console.log('Falha ao obter info do usuário. Status:', response.status);
+                        window.location.href = '/'; 
+                    }
+                } catch (error) {
+                    console.error('Erro ao buscar informações do usuário (catch block):', error);
+                    window.location.href = '/'; 
+                }
+            }
+
+            // Função para carregar as tarefas
+            async function fetchTasks() {
+                try {
+                    console.log('Tentando buscar tarefas...');
+                    const response = await fetch('/api/tarefas');
+                    console.log('Resposta da API de tarefas:', response.status, response.ok);
+                    if (response.ok) {
+                        const data = await response.json();
+                        console.log('Dados das tarefas recebidos:', data);
+                        renderTasks(data.tarefas);
+                    } else {
+                        console.error('Erro ao carregar tarefas:', response.status);
+                    }
+                } catch (error) {
+                    console.error('Erro ao carregar tarefas (catch block):', error);
+                }
+            }
+
+            // Função para renderizar as tarefas na lista
+            function renderTasks(tarefas) {
+                console.log('Renderizando tarefas:', tarefas);
+                taskList.innerHTML = ''; 
+                if (tarefas.length === 0) {
+                    taskList.innerHTML = '<li>Nenhuma tarefa adicionada ainda.</li>';
+                    return;
+                }
+                tarefas.forEach(tarefa => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `
+                        <div>
+                            <strong>${tarefa.materia}</strong>: ${tarefa.descricao}
+                            ${tarefa.dataLimite ? `<br><small>Prazo: ${tarefa.dataLimite}</small>` : ''}
+                            ${tarefa.estrategia ? `<br><small>Estratégia: ${tarefa.estrategia}</small>` : ''}
+                            <br><small>Status: ${tarefa.status}</small>
+                        </div>
+                        <div>
+                            <button class="btn-edit-task" data-id="${tarefa.id}">Editar</button>
+                            <button class="btn-delete-task" data-id="${tarefa.id}">Excluir</button>
+                        </div>
+                    `;
+                    taskList.appendChild(li);
+                });
+
+                // Adiciona event listeners para os botões de editar e excluir
+                document.querySelectorAll('.btn-edit-task').forEach(button => {
+                    button.addEventListener('click', (event) => openEditModal(event.target.dataset.id));
+                });
+                document.querySelectorAll('.btn-delete-task').forEach(button => {
+                    button.addEventListener('click', (event) => deleteTask(event.target.dataset.id));
+                });
+            }
+
+            // Abrir Modal (Adicionar Tarefa)
+            btnAddTask.addEventListener('click', () => {
+                console.log('Botão Adicionar Tarefa clicado.');
+                modalTitle.textContent = 'Adicionar Tarefa';
+                taskForm.reset(); 
+                document.getElementById('taskId').value = '';
+                editingTaskId = null;
+                taskModal.style.display = 'flex'; 
+            });
+
+            // ADIÇÃO: Event Listener para o botão "Adicionar Material"
+            if (btnAddMaterial) { 
+                btnAddMaterial.addEventListener('click', () => {
+                    console.log('Botão Adicionar Material clicado.');
+                    alert('Funcionalidade de Adicionar Material ainda será implementada!');
+                    // Aqui você pode adicionar lógica para abrir um modal de materiais, etc.
+                });
+            } else {
+                console.warn('Botão "Adicionar Material" não encontrado no DOM.');
+            }
+
+            // Abrir Modal (Editar)
+            async function openEditModal(id) {
+                console.log('Abrindo modal de edição para tarefa:', id);
+                try {
+                    const response = await fetch('/api/tarefas');
+                    if (response.ok) {
+                        const data = await response.json();
+                        const tarefa = data.tarefas.find(t => t.id == id);
+                        if (tarefa) {
+                            modalTitle.textContent = 'Editar Tarefa';
+                            document.getElementById('taskId').value = tarefa.id;
+                            document.getElementById('materia').value = tarefa.materia;
+                            document.getElementById('descricao').value = tarefa.descricao;
+                            document.getElementById('dataLimite').value = tarefa.dataLimite || '';
+                            document.getElementById('estrategia').value = tarefa.estrategia || '';
+                            document.getElementById('status').value = tarefa.status;
+                            editingTaskId = tarefa.id;
+                            taskModal.style.display = 'flex'; 
+                        }
+                    }
+                } catch (error) {
+                    console.error('Erro ao carregar tarefa para edição:', error);
+                }
+            }
+
+
+            // Fechar Modal
+            closeButton.addEventListener('click', () => {
+                console.log('Botão fechar modal clicado.');
+                taskModal.style.display = 'none';
+            });
+
+            window.addEventListener('click', (event) => {
+                if (event.target == taskModal) {
+                    console.log('Clicou fora do modal.');
+                    taskModal.style.display = 'none';
+                }
+            });
+
+            // Submeter Formulário de Tarefa (Adicionar/Editar)
+            taskForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                console.log('Formulário de tarefa submetido.');
+                const formData = new FormData(taskForm);
+                const tarefaData = Object.fromEntries(formData.entries());
+
+                let url = '/api/tarefas';
+                let method = 'POST';
+
+                if (editingTaskId) {
+                    url = `/api/tarefas/${editingTaskId}`;
+                    method = 'PUT';
+                }
+
+                try {
+                    console.log(`Enviando ${method} para ${url} com dados:`, tarefaData);
+                    const response = await fetch(url, {
+                        method: method,
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(tarefaData)
+                    });
+
+                    const result = await response.json();
+                    console.log('Resposta da API de salvar tarefa:', result);
+                    if (response.ok) {
+                        alert(result.message);
+                        taskModal.style.display = 'none';
+                        fetchTasks(); // Recarrega a lista de tarefas
+                    } else {
+                        alert('Erro: ' + result.message);
+                    }
+                } catch (error) {
+                    console.error('Erro ao salvar tarefa (catch block):', error);
+                    alert('Erro ao conectar com o servidor.');
+                }
+            });
+
+            // Excluir Tarefa
+            async function deleteTask(id) {
+                console.log('Tentando excluir tarefa:', id);
+                if (!confirm('Tem certeza que deseja excluir esta tarefa?')) {
+                    return;
+                }
+                try {
+                    const response = await fetch(`/api/tarefas/${id}`, {
+                        method: 'DELETE'
+                    });
+                    const result = await response.json();
+                    console.log('Resposta da API de excluir tarefa:', result);
+                    if (response.ok) {
+                        alert(result.message);
+                        fetchTasks(); // Recarrega a lista de tarefas
+                    } else {
+                        alert('Erro: ' + result.message);
+                    }
+                } catch (error) {
+                    console.error('Erro ao excluir tarefa (catch block):', error);
+                    alert('Erro ao conectar com o servidor.');
+                }
+            }
+
+            // Event listener para Logout
+            logoutBtn.addEventListener('click', () => {
+                console.log('Botão Logout clicado.');
+                window.location.href = '/logout';
+            });
+
+            // Inicializa buscando as infos do usuário e depois as tarefas
+            fetchUserInfo();
+            fetchProgressData(); 
+        });
+        
+        async function fetchProgressData() {
+            try {
+                console.log('Tentando buscar dados de progresso...');
+                const response = await fetch('/api/progress');
+                console.log('Resposta da API de progresso:', response.status, response.ok);
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('Dados de progresso recebidos:', data);
+                    updateProgressBar('acertos', data.acertosPercentage);
+                    updateProgressBar('conclusao', data.conclusaoPercentage);
+                } else {
+                    console.error('Erro ao buscar dados de progresso:', response.status);
+                }
+            } catch (error) {
+                console.error('Erro ao buscar dados de progresso (catch block):', error);
+            }
+        }
+
+        function updateProgressBar(type, percentage) {
+            console.log(`Atualizando barra de ${type} para ${percentage}%`);
+            const percentageSpan = document.getElementById(`${type}Percentage`);
+            const progressBar = document.getElementById(`${type}Bar`);
+            const percentageValue = Math.max(0, Math.min(100, percentage));
+
+            if (percentageSpan && progressBar) { 
+                percentageSpan.textContent = `${percentageValue}%`;
+                progressBar.style.width = `${percentageValue}%`;
+            } else {
+                console.warn(`Elemento de progresso não encontrado para ${type}`);
+            }
+        }
+    </script>
+</body>
+</html>

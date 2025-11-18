@@ -1,0 +1,175 @@
+.main-dashboard {
+    width: 100vw;
+    height: 100vh;
+    background: #201b2c; /* Mesma cor de fundo do login */
+    display: flex;
+    flex-direction: column; /* Conteúdo em coluna */
+    align-items: center;
+    padding: 20px;
+    box-sizing: border-box; /* Inclui padding na largura/altura */
+}
+
+.dashboard-header {
+    width: 90%;
+    max-width: 1200px; /* Limita a largura */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #514869; /* Linha divisória */
+}
+
+.dashboard-header h1 {
+    color: #00FFFF;
+    font-weight: 800;
+    margin: 0;
+    font-size: 2.5em; /* Ajusta o tamanho da fonte */
+}
+
+.dashboard-header h1 span {
+    color: #f0ffffde; /* Cor para o nome do usuário */
+}
+
+.btn-logout {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 25px;
+    outline: none;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 2px;
+    background: #FF6347; /* Uma cor de destaque para logout */
+    color: #2b134b;
+    cursor: pointer;
+    box-shadow: 0px 5px 15px -5px #ff634752;
+    transition: background 0.3s ease;
+}
+
+.btn-logout:hover {
+    background: #e0533a;
+}
+
+.dashboard-content {
+    width: 90%;
+    max-width: 1200px;
+    display: grid; /* Usa Grid para layout */
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Colunas responsivas */
+    gap: 30px; /* Espaçamento entre os cartões */
+    flex-grow: 1; /* Permite que o conteúdo cresça */
+}
+
+.card-dashboard {
+    background: #2f2841; /* Mesma cor de cartão do login */
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0px 10px 40px #00000056;
+    color: #f0ffffde;
+    display: flex;
+    flex-direction: column;
+}
+
+.card-dashboard h2 {
+    color: #00FFFF;
+    font-weight: 700;
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+
+.card-dashboard ul {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 20px 0;
+}
+
+.card-dashboard ul li {
+    background: #514869; /* Cor de fundo para itens da lista */
+    padding: 10px 15px;
+    margin-bottom: 10px;
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.card-dashboard ul li:last-child {
+    margin-bottom: 0;
+}
+
+.card-dashboard p {
+    line-height: 1.6;
+}
+
+.btn-add-task,
+.btn-add-material {
+    width: 100%;
+    padding: 12px 0px;
+    margin-top: auto; /* Empurra o botão para baixo */
+    border: none;
+    border-radius: 15px;
+    outline: none;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 2px;
+    background: #00FFFF;
+    color: #2b134b;
+    cursor: pointer;
+    box-shadow: 0px 5px 15px -5px #1ec1f352;
+    transition: background 0.3s ease;
+}
+
+.btn-add-task:hover,
+.btn-add-material:hover {
+    background: #00e6e6;
+}
+
+.progress-chart {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.progress-chart img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px;
+}
+
+.modal {
+    display: none; /* Mantenha apenas este para esconder por padrão */
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.7);
+    /* Remova o 'display: flex;' daqui, ele será aplicado via JS */
+    justify-content: center; /* Manter para centralização quando visível */
+    align-items: center;    /* Manter para centralização quando visível */
+}
+/* Adicione uma classe para mostrar o modal, que o JS vai alternar */
+.modal.show-modal { /* NOVA CLASSE */
+    display: flex; /* Agora sim, use flex para mostrar e centralizar */
+}
+
+/* Media Queries para Responsividade do Dashboard */
+@media only screen and (max-width: 768px) {
+    .dashboard-header {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .dashboard-header h1 {
+        font-size: 2em;
+        margin-bottom: 15px;
+    }
+
+    .dashboard-content {
+        grid-template-columns: 1fr; /* Uma coluna em telas menores */
+    }
+
+    .main-dashboard {
+        padding: 15px;
+    }
+}

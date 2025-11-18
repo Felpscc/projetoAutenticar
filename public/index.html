@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./css/styles.css"> <title>Login - Plataforma de Estudos</title>
+</head>
+<body>
+    <div class="main-login">
+        <div class="left-login">
+            <h1>Faça seu Login<br>e organize suas ideias.</h1>
+            <img src="./img/study.jpg" class="img" alt="Estudo"> </div>
+        <div class="right-login">
+            <div class="card-login">
+                <h1>Login</h1>
+                <form id="loginForm">
+                    <div class="textfield">
+                        <label for="username">Usuário</label>
+                        <input type="text" id="username" name="username" placeholder="Digite seu usuário" required>
+                    </div>
+                    <div class="textfield">
+                        <label for="password">Senha</label>
+                        <input type="password" id="password" name="password" placeholder="Digite sua senha" required>
+                    </div>
+                    <button type="submit" class="btn-login">Entrar</button>
+                </form>
+                <div id="mensagem" style="color: #00FFFF; margin-top: 10px; text-align: center;"></div>
+                <p style="color: #f0ffffde; margin-top: 15px;">Não tem uma conta? <a href="/register" style="color: #00FFFF; text-decoration: none;">Cadastre-se aqui</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script src="./js/login.js"></script> </body>
+</html>

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./css/styles.css">
+    <link rel="stylesheet" href="./css/dashboard.css"> <title>Sobre - Plataforma de Estudos</title>
+</head>
+<body>
+    <div class="main-dashboard">
+        <div class="dashboard-header">
+            <h1>Sobre a Plataforma</h1>
+            <nav class="main-nav">
+                <a href="/home.html">Início</a>
+                <a href="/dashboard.html">Dashboard</a>
+                <a href="/about.html" class="active">Sobre</a>
+                <button onclick="location.href='/logout'" class="btn-logout">Sair</button>
+            </nav>
+        </div>
+
+        <div class="dashboard-content">
+            <div class="card-dashboard" style="grid-column: 1 / -1;"> <h2>Nossa Missão</h2>
+                <p>Nossa missão é fornecer uma plataforma intuitiva e eficaz para estudantes de todas as áreas organizarem seus estudos, definirem metas e acompanharem seu progresso. Acreditamos que a organização é a chave para o sucesso acadêmico e pessoal.</p>
+                
+                <h2>Tecnologias Utilizadas</h2>
+                <p>Esta plataforma foi desenvolvida utilizando:</p>
+                <ul>
+                    <li>Node.js com Express para o backend</li>
+                    <li>SQLite como banco de dados para simplicidade e portabilidade</li>
+                    <li>HTML5, CSS3 e JavaScript para o frontend</li>
+                    <li>bcryptjs para segurança de senhas</li>
+                    <li>express-session para gerenciamento de sessão</li>
+                </ul>
+
+                <h2>Contato</h2>
+                <p>Se tiver dúvidas ou sugestões, entre em contato conosco.</p>
+                <p>Email: <a href="mailto:contato@plataformadeestudos.com" style="color: #00FFFF; text-decoration: none;">contato@plataformadeestudos.com</a></p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

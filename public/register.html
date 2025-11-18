@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./css/styles.css">
+    <title>Cadastro - Plataforma de Estudos</title>
+</head>
+<body>
+    <div class="main-login">
+        <div class="left-login">
+            <h1>Crie sua Conta<br>e comece a organizar.</h1>
+            <img src="./img/study.jpg" class="img" alt="Estudo">
+        </div>
+        <div class="right-login">
+            <div class="card-login">
+                <h1>Cadastro</h1>
+                <form id="registerForm">
+                    <div class="textfield">
+                        <label for="username">Usuário</label>
+                        <input type="text" id="username" name="username" placeholder="Escolha um nome de usuário" required>
+                    </div>
+                    <div class="textfield">
+                        <label for="password">Senha</label>
+                        <input type="password" id="password" name="password" placeholder="Crie sua senha" required>
+                    </div>
+                    <button type="submit" class="btn-login">Cadastrar</button>
+                </form>
+                <div id="mensagem" style="color: #00FFFF; margin-top: 10px; text-align: center;"></div>
+                <p style="color: #f0ffffde; margin-top: 15px;">Já tem uma conta? <a href="/" style="color: #00FFFF; text-decoration: none;">Faça login aqui</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('registerForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const mensagem = document.getElementById('mensagem');
+
+            try {
+                const response = await fetch('/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    mensagem.style.color = '#00FFFF';
+                    mensagem.textContent = data.message + ' Redirecionando para login...';
+                    setTimeout(() => {
+                        window.location.href = '/'; // Redirect to login page after successful registration
+                    }, 2000);
+                } else {
+                    mensagem.style.color = '#FF6347';
+                    mensagem.textContent = data.message;
+                }
+            } catch (error) {
+                mensagem.style.color = '#FF6347';
+                mensagem.textContent = 'Erro ao conectar ao servidor';
+                console.error('Erro:', error);
+            }
+        });
+    </script>
+</body>
+</html>
